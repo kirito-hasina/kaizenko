@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, LayoutGrid, Moon, PiggyBank, Receipt, Sun } from 'lucide-react'
-import { useStore } from '../store'
 import type { LucideIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
+import { useStore } from '../store'
 import { monthKey, monthLabel, shiftMonth } from '../lib'
 
 export type Tab = 'overview' | 'budget' | 'wallet'
@@ -17,7 +17,7 @@ const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
 export function MonthNav({ month, setMonth }: { month: string; setMonth: (m: string) => void }) {
   const isCurrent = month === monthKey()
   const arrow =
-    'grid h-9 w-9 place-items-center rounded-full bg-surface text-ink transition hover:opacity-80 active:scale-95'
+    'grid h-10 w-10 place-items-center rounded-full bg-surface text-ink transition hover:opacity-80 active:scale-95'
   return (
     <div className="flex items-center gap-2">
       <button onClick={() => setMonth(shiftMonth(month, -1))} aria-label="Mois précédent" className={arrow}>
@@ -30,7 +30,7 @@ export function MonthNav({ month, setMonth }: { month: string; setMonth: (m: str
       {!isCurrent && (
         <button
           onClick={() => setMonth(monthKey())}
-          className="rounded-full bg-ink px-3 py-2 text-xs text-on-ink transition hover:opacity-90"
+          className="rounded-full bg-ink px-3 py-2.5 text-xs text-on-ink transition hover:opacity-90"
         >
           Aujourd’hui
         </button>
@@ -49,33 +49,20 @@ type ShellProps = {
 }
 
 export default function Shell({ tab, setTab, title, subtitle, right, children }: ShellProps) {
-    const theme = useStore((s) => s.theme)
-    const toggleTheme = useStore((s) => s.toggleTheme)
+  const theme = useStore((s) => s.theme)
+  const toggleTheme = useStore((s) => s.toggleTheme)
+
   return (
     <div className="min-h-screen p-2 sm:p-5">
       <div className="mx-auto max-w-350 rounded-[2rem] bg-shell p-3 sm:p-6">
-        {/* barre du haut */}
+        {/* barre du haut : 2 lignes sur mobile, 1 ligne sur ordinateur */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 rounded-full bg-surface py-1.5 pl-3 pr-4 shadow-sm">
+          <div className="order-1 flex items-center gap-2 rounded-full bg-surface py-1.5 pl-3 pr-4 shadow-sm">
             <img src="/kaizenko-mark.png" alt="" className="h-7 w-7 object-contain" />
             <span className="text-sm font-semibold">Kaizenko</span>
           </div>
 
-          <nav className="flex gap-1 overflow-x-auto rounded-full bg-surface p-1 shadow-sm">
-            {TABS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => setTab(id)}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                  tab === id ? 'bg-ink text-on-ink' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
-
-                      <div className="flex items-center gap-2">
+          <div className="order-2 flex items-center gap-2 md:order-3">
             <div className="hidden rounded-full bg-surface px-4 py-2 text-xs capitalize text-muted shadow-sm md:block">
               {format(new Date(), 'EEEE d MMMM', { locale: fr })}
             </div>
@@ -88,10 +75,24 @@ export default function Shell({ tab, setTab, title, subtitle, right, children }:
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
           </div>
+
+          <nav className="order-3 grid w-full grid-cols-3 gap-1 rounded-full bg-surface p-1 shadow-sm md:order-2 md:flex md:w-auto">
+            {TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={`rounded-full px-3 py-2.5 text-center text-sm font-medium transition md:px-4 md:py-2 ${
+                  tab === id ? 'bg-ink text-on-ink' : 'text-muted hover:text-ink'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
         </div>
 
         <div className="mt-6 flex gap-6">
-          {/* barre latérale */}
+          {/* barre latérale (ordinateur seulement) */}
           <aside className="hidden lg:block">
             <div className="sticky top-6 flex flex-col gap-2 rounded-full bg-card p-2">
               {TABS.map(({ id, label, icon: Icon }) => (

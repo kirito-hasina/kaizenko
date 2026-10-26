@@ -2,10 +2,10 @@ import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { X } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { createPortal } from 'react-dom'
 
 export const inputCls =
-  'w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-muted/70 outline-none transition focus:border-accent'
-
+  'w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-base text-ink placeholder:text-muted/70 outline-none transition focus:border-accent sm:text-sm'
 const btn = 'inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-95'
 export const btnDark = `${btn} bg-ink text-on-ink hover:opacity-90`
 export const btnLight = `${btn} bg-surface text-ink hover:opacity-80`
@@ -38,7 +38,7 @@ export function Tile({
           <Icon size={15} />
         </span>
       </div>
-      <div className={`mt-3 text-2xl font-semibold tracking-tight ${tone}`}>{value}</div>
+      <div className={`mt-3 text-xl font-semibold tracking-tight sm:text-2xl ${tone}`}>{value}</div>
     </div>
   )
 }
@@ -54,7 +54,7 @@ export function HighlightTile({
           <Icon size={15} />
         </span>
       </div>
-      <div className="mt-3 text-2xl font-semibold tracking-tight">{value}</div>
+      <div className="mt-3 text-xl sm:text-2xl font-semibold tracking-tight">{value}</div>
       {hint && <div className="mt-1 text-xs text-white/80">{hint}</div>}
     </div>
   )
@@ -77,29 +77,35 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden' // la page derrière ne défile plus
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = previous
+    }
   }, [onClose])
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={title}
     >
       <div
-        className="animate-fade-up max-h-[90vh] w-full max-w-md overflow-y-auto rounded-3xl bg-shell p-5 shadow-2xl"
+        className="animate-fade-up max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-shell p-5 pb-8 shadow-2xl sm:max-w-md sm:rounded-3xl sm:pb-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-medium text-ink">{title}</h2>
-          <button onClick={onClose} aria-label="Fermer" className="text-muted transition hover:text-ink">
+          <button onClick={onClose} aria-label="Fermer" className="grid h-9 w-9 place-items-center rounded-full text-muted transition hover:text-ink">
             <X size={18} />
           </button>
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
