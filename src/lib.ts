@@ -156,10 +156,14 @@ export function humanDays(days: number) {
 }
 
 export function goalEstimate(goal: Goal, balance: number, rate: number) {
-  const remaining = Math.max(goal.target - balance, 0)
-  const progress = goal.target > 0 ? Math.min(Math.max(balance, 0) / goal.target, 1) : 0
+  const share = goal.percent / 100
+  const allocated = Math.max(balance, 0) * share // argent réservé à cet objectif
+  const goalRate = rate * share // gain par jour qui revient à cet objectif
+
+  const remaining = Math.max(goal.target - allocated, 0)
+  const progress = goal.target > 0 ? Math.min(allocated / goal.target, 1) : 0
   const done = remaining === 0
-  const { days, date } = estimateWithRate(remaining, rate)
+  const { days, date } = estimateWithRate(remaining, goalRate)
 
   let neededPerDay: number | null = null
   let overdue = false
@@ -169,5 +173,5 @@ export function goalEstimate(goal: Goal, balance: number, rate: number) {
     else overdue = true
   }
 
-  return { remaining, progress, done, days, date, neededPerDay, overdue }
+  return { allocated, goalRate, remaining, progress, done, days, date, neededPerDay, overdue, share }
 }

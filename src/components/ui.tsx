@@ -109,3 +109,23 @@ export function Modal({ title, onClose, children }: { title: string; onClose: ()
     document.body,
   )
 }
+
+export function ConfirmModal({
+  title, children, confirmLabel = 'Supprimer', onConfirm, onCancel,
+}: {
+  title: string
+  children: ReactNode
+  confirmLabel?: string
+  onConfirm: () => void
+  onCancel: () => void
+}) {
+  return (
+    <Modal title={title} onClose={onCancel}>
+      <div className="text-sm leading-relaxed text-muted">{children}</div>
+      <div className="mt-5 grid grid-cols-2 gap-2">
+        <button onClick={onCancel} className={btnLight}>Annuler</button>
+        <button onClick={onConfirm} className={btnAccent}>{confirmLabel}</button>
+      </div>
+    </Modal>
+  )
+}

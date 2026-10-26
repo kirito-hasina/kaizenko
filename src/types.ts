@@ -28,5 +28,6 @@ export interface Goal {
   id: string
   name: string
   target: number
+  percent: number // part du portefeuille réservée à cet objectif (0 à 100)
   deadline?: string // AAAA-MM-JJ, facultatif
 }
