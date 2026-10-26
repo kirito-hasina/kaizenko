@@ -77,17 +77,16 @@ export default function Shell({ tab, setTab, title, subtitle, right, children }:
             </button>
           </div>
 
-          <nav className="order-3 grid w-full grid-cols-3 gap-1 rounded-full bg-surface p-1 shadow-sm md:order-2 md:flex md:w-auto">
-            {TABS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => setTab(id)}
-                className={`rounded-full px-3 py-2.5 text-center text-sm font-medium transition md:px-4 md:py-2 ${
-                  tab === id ? 'bg-ink text-on-ink' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {label}
-              </button>
+            <nav className="order-3 grid w-full grid-cols-4 gap-1 rounded-full bg-surface p-1 shadow-sm md:order-2 md:flex md:w-auto">            {TABS.map(({ id, label }) => (
+                <button
+                    key={id}
+                    onClick={() => setTab(id)}
+                    className={`rounded-full px-1 py-2.5 text-center text-xs font-medium transition sm:text-sm md:px-4 md:py-2 ${
+                        tab === id ? 'bg-ink text-on-ink' : 'text-muted hover:text-ink'
+                    }`}
+                    >
+                    {label}
+                </button>
             ))}
           </nav>
         </div>
