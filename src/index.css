@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+@theme {
+  --color-page: #e8e7e3;
+  --color-shell: #f7f6f2;
+  --color-card: #efeee9;
+  --color-surface: #ffffff;
+  --color-line: #dedcd5;
+  --color-ink: #17171a;
+  --color-on-ink: #ffffff;
+  --color-muted: #77766f;
+  --color-accent: #e0141f;
+  --color-ok: #1f9d6b;
+}
+
+body {
+  margin: 0;
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.animate-fade-up { animation: fade-up 0.35s ease both; }
+
+:root[data-theme='dark'] {
+  --color-page: #0d0d10;
+  --color-shell: #141417;
+  --color-card: #1c1c21;
+  --color-surface: #25252b;
+  --color-line: #33333b;
+  --color-ink: #f3f2ee;
+  --color-on-ink: #17171a;
+  --color-muted: #9a998f;
+  --color-accent: #ff4b55;
+  --color-ok: #3ccf91;
+  color-scheme: dark;
+}
+
+.text-on-ink {
+  color: var(--color-on-ink);
+}
