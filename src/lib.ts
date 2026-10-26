@@ -2,7 +2,7 @@ import {
   addDays, differenceInCalendarDays, endOfMonth, format, getDaysInMonth, parseISO, subDays,
 } from 'date-fns'
 import { fr } from 'date-fns/locale'
-import type { Category, Expense, Goal, Method, MonthPlan, WalletTx } from './types'
+import type { Allocation, Category, Expense, Goal, Method, MonthPlan, WalletTx } from './types'
 
 export const CATEGORIES: Record<Category, { label: string; hint: string; color: string }> = {
   survie: { label: 'Survie', hint: 'Loyer, nourriture, transport, santé', color: '#64748b' },
@@ -174,4 +174,72 @@ export function goalEstimate(goal: Goal, balance: number, rate: number) {
   }
 
   return { allocated, goalRate, remaining, progress, done, days, date, neededPerDay, overdue, share }
+}
+
+/* ---------- répartition du budget ---------- */
+
+export type BucketKey = keyof Allocation
+
+export const BUCKETS: Record<BucketKey, { label: string; hint: string; color: string }> = {
+  needs: { label: 'Besoins essentiels', hint: 'Loyer, nourriture, transport, santé', color: '#64748b' },
+  wants: { label: 'Loisirs et envies', hint: 'Sorties, shopping, formations, passe-temps', color: '#f97316' },
+  savings: { label: 'Épargne', hint: 'Argent mis de côté pour tes objectifs', color: '#10b981' },
+}
+
+// à quelle catégorie de répartition appartient chaque catégorie Kakeibo
+export const BUCKET_OF: Record<Category, 'needs' | 'wants'> = {
+  survie: 'needs',
+  extra: 'needs',
+  optionnel: 'wants',
+  culture: 'wants',
+}
+
+export const DEFAULT_ALLOCATION: Allocation = { needs: 50, wants: 30, savings: 20 }
+
+export const PRESETS: { id: string; label: string; name: string; a: Allocation }[] = [
+  { id: '50-30-20', label: '50 / 30 / 20', name: 'Équilibré', a: { needs: 50, wants: 30, savings: 20 } },
+  { id: '60-20-20', label: '60 / 20 / 20', name: 'Épargne renforcée', a: { needs: 60, wants: 20, savings: 20 } },
+  { id: '70-20-10', label: '70 / 20 / 10', name: 'Besoins élevés', a: { needs: 70, wants: 20, savings: 10 } },
+  { id: '75-15-10', label: '75 / 15 / 10', name: 'Revenu serré', a: { needs: 75, wants: 15, savings: 10 } },
+]
+
+export function matchPreset(a: Allocation) {
+  const p = PRESETS.find((x) => x.a.needs === a.needs && x.a.wants === a.wants && x.a.savings === a.savings)
+  return p ? p.id : 'custom'
+}
+
+/** répartition d'un mois : la sienne, sinon celle du mois précédent, sinon 50/30/20 */
+export function allocationFor(allocations: Record<string, Allocation>, month: string): Allocation {
+  if (allocations[month]) return allocations[month]
+  const previous = Object.keys(allocations).filter((k) => k < month).sort().pop()
+  return previous ? allocations[previous] : DEFAULT_ALLOCATION
+}
+
+/** change un pourcentage : les deux autres s'ajustent pour que le total reste à 100 */
+export function rebalance(a: Allocation, key: BucketKey, value: number): Allocation {
+  const v = Math.max(0, Math.min(100, Math.round(value)))
+  const [k1, k2] = (['needs', 'wants', 'savings'] as BucketKey[]).filter((k) => k !== key)
+  const rest = 100 - v
+  const sum = a[k1] + a[k2]
+  const first = sum > 0 ? Math.round((rest * a[k1]) / sum) : Math.round(rest / 2)
+  return { ...a, [key]: v, [k1]: first, [k2]: rest - first }
+}
+
+/** montants prévus (la somme fait toujours exactement le revenu) */
+export function allocationAmounts(income: number, a: Allocation): Record<BucketKey, number> {
+  const needs = Math.round((income * a.needs) / 100)
+  const wants = Math.round((income * a.wants) / 100)
+  return { needs, wants, savings: income - needs - wants }
+}
+
+/** montants réels du mois : dépenses rangées par catégorie + épargne nette du portefeuille */
+export function allocationActual(expenses: Expense[], txs: WalletTx[], month: string): Record<BucketKey, number> {
+  const out: Record<BucketKey, number> = { needs: 0, wants: 0, savings: 0 }
+  expenses
+    .filter((e) => e.date.startsWith(month))
+    .forEach((e) => {
+      out[BUCKET_OF[e.category]] += e.amount
+    })
+  out.savings = txs.filter((t) => t.date.startsWith(month)).reduce((sum, t) => sum + t.amount, 0)
+  return out
 }

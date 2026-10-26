@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react'
-import { ChevronLeft, ChevronRight, LayoutGrid, Moon, PiggyBank, Receipt, Sun } from 'lucide-react'
+import { ChevronLeft, ChevronRight, LayoutGrid, Moon, PiggyBank, Receipt, Sun, PieChart } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { useStore } from '../store'
 import { monthKey, monthLabel, shiftMonth } from '../lib'
 
-export type Tab = 'overview' | 'budget' | 'wallet'
+export type Tab = 'overview' | 'budget' | 'allocation' | 'wallet'
 
 const TABS: { id: Tab; label: string; icon: LucideIcon }[] = [
   { id: 'overview', label: 'Aperçu', icon: LayoutGrid },
   { id: 'budget', label: 'Budget', icon: Receipt },
+  { id: 'allocation', label: 'Répartition', icon: PieChart },
   { id: 'wallet', label: 'Portefeuille', icon: PiggyBank },
 ]
 

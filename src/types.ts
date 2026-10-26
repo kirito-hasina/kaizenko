@@ -31,3 +31,9 @@ export interface Goal {
   percent: number // part du portefeuille réservée à cet objectif (0 à 100)
   deadline?: string // AAAA-MM-JJ, facultatif
 }
+
+export interface Allocation {
+  needs: number // % du revenu pour les besoins essentiels
+  wants: number // % pour les loisirs et envies
+  savings: number // % pour l'épargne (needs + wants + savings = 100)
+}

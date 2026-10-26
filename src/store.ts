@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Expense, Goal, MonthPlan, WalletTx } from './types'
+import type { Allocation, Expense, Goal, MonthPlan, WalletTx } from './types'
 
 type State = {
   theme: 'light' | 'dark'
@@ -8,6 +8,8 @@ type State = {
   expenses: Expense[]
   walletTxs: WalletTx[]
   goals: Goal[]
+  allocations: Record<string, Allocation>
+  setAllocation: (month: string, a: Allocation) => void
   toggleTheme: () => void
   setPlan: (month: string, plan: MonthPlan) => void
   addExpense: (e: Omit<Expense, 'id'>) => void
@@ -31,7 +33,9 @@ export const useStore = create<State>()(
       expenses: [],
       walletTxs: [],
       goals: [],
+      allocations: {},
       toggleTheme: () => set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
+      setAllocation: (month, a) => set((s) => ({ allocations: { ...s.allocations, [month]: a } })),
       setPlan: (month, plan) => set((s) => ({ plans: { ...s.plans, [month]: plan } })),
       addExpense: (e) =>
         set((s) => ({ expenses: [{ ...e, id: crypto.randomUUID() }, ...s.expenses] })),

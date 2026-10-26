@@ -6,11 +6,13 @@ import type { Tab } from './components/Layout'
 import Overview from './components/Overview'
 import Budget from './components/Budget'
 import WalletPage from './components/Wallet'
+import Repartition from './components/Repartition'
 
 const SUBTITLES: Record<Tab, string> = {
   overview: 'Garde un œil sur ton budget, ton portefeuille et tes objectifs.',
   budget: 'Planifie ton mois et note chaque dépense avec la méthode Kakeibo.',
   wallet: 'Mets de l’argent de côté, retire quand il le faut, et vise un objectif.',
+  allocation: 'Donne une mission à chaque ariary : répartis ton revenu entre besoins, envies et épargne.',
 }
 
 export default function App() {
@@ -33,6 +35,7 @@ export default function App() {
       {tab === 'overview' && <Overview month={month} goTo={setTab} />}
       {tab === 'budget' && <Budget month={month} />}
       {tab === 'wallet' && <WalletPage />}
+      {tab === 'allocation' && <Repartition month={month} />}
     </Shell>
   )
 }
